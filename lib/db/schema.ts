@@ -1,5 +1,6 @@
 import {
   boolean,
+  customType,
   integer,
   pgTable,
   primaryKey,
@@ -173,3 +174,25 @@ export const authenticators = pgTable(
     }),
   ],
 );
+
+/** Voice/song clips (mp3 bytes). Served via /api/audio/[clipId] with
+ *  immutable HTTP caching; hash in the row detects stale entries. */
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
+
+export const audioClips = pgTable("audio_clips", {
+  clipId: text("clip_id").primaryKey(),
+  bytes: bytea("bytes").notNull(),
+  contentType: text("content_type").notNull().default("audio/mpeg"),
+  byteLength: integer("byte_length").notNull().default(0),
+  sha256: text("sha256").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});

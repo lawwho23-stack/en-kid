@@ -160,6 +160,9 @@ def main() -> None:
                     help="delete mp3 files no longer referenced")
     ap.add_argument("--force", action="store_true",
                     help="regenerate every clip")
+    ap.add_argument("--manifest-base", default="/audio/clips",
+                    help="URL base for manifest entries: /audio/clips (static "
+                         "files) or /api/audio (database-backed clips)")
     args = ap.parse_args()
 
     voices = {
@@ -198,30 +201,39 @@ def main() -> None:
     )
 
     os.makedirs(args.out, exist_ok=True)
+    api_mode = args.manifest_base == "/api/audio"
     made, skipped = 0, 0
     for clip_id, text, model in inventory:
         h = clip_hash(clip_id, text, model)
-        if not args.force and hashes.get(clip_id) == h:
-            path = os.path.join(args.out, os.path.basename(clips[clip_id]))
-            if os.path.exists(path):
-                skipped += 1
-                continue
-        audio = speak(text, model, api_key)
         filename = f"{safe(clip_id)}-{h}.mp3"
+        new_url = (
+            f"/api/audio/{urllib.parse.quote(clip_id, safe='')}"
+            if api_mode
+            else f"{args.manifest_base}/{filename}"
+        )
+        if (
+            not args.force
+            and hashes.get(clip_id) == h
+            and os.path.exists(os.path.join(args.out, filename))
+        ):
+            clips[clip_id] = new_url
+            skipped += 1
+            continue
+        audio = speak(text, model, api_key)
         with open(os.path.join(args.out, filename), "wb") as f:
             f.write(audio)
         # remove the stale file for this clip, if any
         old = clips.get(clip_id)
-        if old:
+        if old and not old.startswith("/api/audio/"):
             stale = os.path.join(args.out, os.path.basename(old))
             if os.path.exists(stale) and os.path.basename(stale) != filename:
                 os.remove(stale)
-        clips[clip_id] = f"/audio/clips/{filename}"
+        clips[clip_id] = new_url
         hashes[clip_id] = h
         made += 1
         print(f"  + {clip_id} ({len(audio)} bytes)")
 
-    if args.prune:
+    if args.prune and args.manifest_base != "/api/audio":
         live = {os.path.basename(v) for v in clips.values()}
         for name in os.listdir(args.out):
             if name.endswith(".mp3") and name not in live:

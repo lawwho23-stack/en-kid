@@ -1,6 +1,6 @@
 /* Minimal service worker: cache the shell + audio/art for offline play. */
-const SHELL = "kids-english-shell-v2";
-const MEDIA = "kids-english-media-v2";
+const SHELL = "kids-english-shell-v3";
+const MEDIA = "kids-english-media-v3";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -31,8 +31,10 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   // Media + static: cache-first so play works offline after first load.
+  // /api/audio/* responses are immutable (content-hashed ids), safe to cache.
   if (
     url.pathname.startsWith("/audio/") ||
+    url.pathname.startsWith("/api/audio/") ||
     url.pathname.startsWith("/_next/static/")
   ) {
     event.respondWith(
