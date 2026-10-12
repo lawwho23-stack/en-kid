@@ -111,6 +111,9 @@ function setForWord(wordId: string): CelebrationSet {
  */
 export function allTextIds(): string[] {
   const ids = new Set<string>();
+  for (const world of WORLDS) {
+    ids.add(`greeting:${world.character.id}`);
+  }
   for (const [wordId, word] of Object.entries(WORDS)) {
     const set = setForWord(wordId);
     ids.add(`word:${wordId}`);

@@ -51,6 +51,15 @@ class AudioEngine {
     return !!this.ctx && !!this.master && !this.muted;
   }
 
+  /** Nudge a suspended context (autoplay policy). Safe to call anywhere. */
+  private nudge() {
+    if (this.ctx && this.ctx.state === "suspended") {
+      void this.ctx.resume().catch(() => {
+        // Still blocked: the next real tap retries via unlock().
+      });
+    }
+  }
+
   /** Decode once and reuse (no re-fetch on repeat taps). */
   async preload(clipIds: string[]) {
     this.manifest = await loadManifest();
@@ -74,6 +83,7 @@ class AudioEngine {
   }
 
   private playBuffer(clipId: string): boolean {
+    this.nudge();
     if (!this.ready()) return false;
     const buf = this.buffers.get(clipId);
     if (!buf) return false;
@@ -85,6 +95,7 @@ class AudioEngine {
   }
 
   private synth(steps: Parameters<typeof playSteps>[2]) {
+    this.nudge();
     if (!this.ready()) return 0;
     return playSteps(this.ctx!, this.master!, steps);
   }
@@ -93,6 +104,12 @@ class AudioEngine {
   playWord(wordId: string): number {
     if (this.playBuffer(`word:${wordId}`)) return 1;
     return this.synth(wordSteps(`word:${wordId}`));
+  }
+
+  /** Character greeting ("Hi! I am Momo!"). Sound-check on world entry. */
+  playGreeting(characterId: string): number {
+    if (this.playBuffer(`greeting:${characterId}`)) return 2;
+    return this.synth(wordSteps(`greeting:${characterId}`));
   }
 
   playPhrase(wordId: string): number {

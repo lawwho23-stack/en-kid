@@ -289,7 +289,9 @@
     "retry:pippa-cheer:2": "/audio/clips/retry-pippa-cheer-2-c11bbc90988c.mp3",
     "motivation:pippa-cheer:0": "/audio/clips/motivation-pippa-cheer-0-5bf720c93505.mp3",
     "motivation:pippa-cheer:1": "/audio/clips/motivation-pippa-cheer-1-1294627c5279.mp3",
-    "motivation:pippa-cheer:2": "/audio/clips/motivation-pippa-cheer-2-8b353bdf7725.mp3"
+    "motivation:pippa-cheer:2": "/audio/clips/motivation-pippa-cheer-2-8b353bdf7725.mp3",
+    "greeting:momo-cat": "/audio/clips/greeting-momo-cat-2481e67ce80f.mp3",
+    "greeting:pippa-bird": "/audio/clips/greeting-pippa-bird-d254f0fd3fc4.mp3"
   },
   "hashes": {
     "word:cat": "02ad2386c5ef",
@@ -579,6 +581,8 @@
     "retry:pippa-cheer:2": "c11bbc90988c",
     "motivation:pippa-cheer:0": "5bf720c93505",
     "motivation:pippa-cheer:1": "1294627c5279",
-    "motivation:pippa-cheer:2": "8b353bdf7725"
+    "motivation:pippa-cheer:2": "8b353bdf7725",
+    "greeting:momo-cat": "2481e67ce80f",
+    "greeting:pippa-bird": "d254f0fd3fc4"
   }
 }

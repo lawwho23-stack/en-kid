@@ -76,6 +76,15 @@ def build_inventory(data: dict, voices: dict) -> list:
                 word_voice[w] = tag
 
     inv: list = []
+    for world in worlds:
+        tag = world["character"]["voice"]
+        inv.append(
+            (
+                f"greeting:{world['character']['id']}",
+                world["character"]["greeting"],
+                voices[tag],
+            )
+        )
     for wid, w in words.items():
         tag = word_voice.get(wid, "voice-a")
         model = voices[tag]

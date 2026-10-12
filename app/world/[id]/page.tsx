@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { audio } from "@/lib/audio/engine";
 import { getWorld, type AgeBand } from "@/lib/content";
 import { useGame } from "@/lib/store";
 
@@ -19,6 +20,7 @@ export default function WorldPage() {
   const beginSession = useGame((s) => s.beginSession);
   const flush = useGame((s) => s.flush);
   const [age, setAge] = useState<AgeBand>("3-4");
+  const greeted = useRef(false);
 
   useEffect(() => {
     if (world) beginSession(world.id);
@@ -27,6 +29,15 @@ export default function WorldPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world?.id]);
+
+  /** First tap anywhere: unlock audio + character says hi (sound check). */
+  function greet() {
+    audio.unlock();
+    if (!world || greeted.current) return;
+    greeted.current = true;
+    void audio.preload([`greeting:${world.character.id}`]);
+    audio.playGreeting(world.character.id);
+  }
 
   if (!world) {
     return (
@@ -44,6 +55,7 @@ export default function WorldPage() {
   return (
     <main
       className="flex min-h-full flex-col items-center gap-5 p-6"
+      onPointerDown={greet}
       style={{ background: `linear-gradient(to bottom, ${world.colors.primary}, ${world.colors.secondary})` }}
     >
       <div className="flex w-full max-w-2xl items-center justify-between">
