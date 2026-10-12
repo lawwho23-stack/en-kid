@@ -1,0 +1,24 @@
+{
+  "name": "Kids English",
+  "short_name": "KidsEnglish",
+  "description": "Tap-first English learning game for toddlers and preschoolers.",
+  "start_url": "/select",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#8ED8F8",
+  "theme_color": "#8ED8F8",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

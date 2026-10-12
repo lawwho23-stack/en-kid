@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="48" fill="#8ED8F8"/>
+  <text x="50" y="68" font-size="52" text-anchor="middle">🐱</text>
+  <circle cx="78" cy="24" r="10" fill="#FFD84D"/>
+  <circle cx="20" cy="76" r="7" fill="#7FE3B5"/>
+</svg>

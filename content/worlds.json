@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "worlds": [
+    {
+      "id": "animal-farm",
+      "title": "Animal Farm",
+      "emoji": "🚜",
+      "colors": { "primary": "#7FE3B5", "secondary": "#FFD84D" },
+      "character": {
+        "id": "momo-cat",
+        "name": "Momo",
+        "emoji": "🐱",
+        "voice": "voice-a",
+        "greeting": "Hi! I am Momo! Let's learn animals!"
+      },
+      "lessons": [
+        {
+          "id": "farm-1",
+          "words": ["cat", "dog", "cow", "duck"],
+          "activities": ["tap-and-hear", "listen-and-pick", "chant-along"],
+          "choices_per_question": { "age_1_3": 2, "age_4_5": 3 },
+          "distractor_pool": "animals",
+          "celebration_set": "momo-cheer"
+        },
+        {
+          "id": "farm-2",
+          "words": ["pig", "horse", "sheep", "chicken"],
+          "activities": ["tap-and-hear", "listen-and-pick", "chant-along"],
+          "choices_per_question": { "age_1_3": 2, "age_4_5": 3 },
+          "distractor_pool": "animals",
+          "celebration_set": "momo-cheer"
+        },
+        {
+          "id": "farm-3",
+          "words": ["goat", "rabbit", "mouse", "bird"],
+          "activities": ["tap-and-hear", "listen-and-pick", "chant-along"],
+          "choices_per_question": { "age_1_3": 2, "age_4_5": 3 },
+          "distractor_pool": "animals",
+          "celebration_set": "momo-cheer"
+        },
+        {
+          "id": "farm-4",
+          "words": ["frog", "fish", "bee", "butterfly"],
+          "activities": ["tap-and-hear", "listen-and-pick", "chant-along"],
+          "choices_per_question": { "age_1_3": 2, "age_4_5": 3 },
+          "distractor_pool": "animals",
+          "celebration_set": "momo-cheer"
+        },
+        {
+          "id": "farm-5",
+          "words": ["turtle", "lion", "elephant", "monkey"],
+          "activities": ["tap-and-hear", "listen-and-pick", "chant-along"],
+          "choices_per_question": { "age_1_3": 2, "age_4_5": 3 },
+          "distractor_pool": "animals",
+          "celebration_set": "momo-cheer"
+        }
+      ]
+    },
+    {
+      "id": "color-meadow",
+      "title": "Color Meadow",
+      "emoji": "🌈",
+      "colors": { "primary": "#8ED8F8", "secondary": "#B08CFF" },
+      "character": {
+        "id": "pippa-bird",
+        "name": "Pippa",
+        "emoji": "🐦",
+        "voice": "voice-b",
+        "greeting": "Hello! I am Pippa! Let's learn colors!"
+      },
+      "lessons": [
+        {
+          "id": "colors-1",
+          "words": ["red", "orange", "yellow", "green"],
+          "activities": ["tap-and-hear", "listen-and-pick", "chant-along"],
+          "choices_per_question": { "age_1_3": 2, "age_4_5": 3 },
+          "distractor_pool": "colors",
+          "celebration_set": "pippa-cheer"
+        },
+        {
+          "id": "colors-2",
+          "words": ["blue", "purple", "pink", "brown"],
+          "activities": ["tap-and-hear", "listen-and-pick", "chant-along"],
+          "choices_per_question": { "age_1_3": 2, "age_4_5": 3 },
+          "distractor_pool": "colors",
+          "celebration_set": "pippa-cheer"
+        },
+        {
+          "id": "colors-3",
+          "words": ["black", "white", "gray", "rainbow"],
+          "activities": ["tap-and-hear", "listen-and-pick", "chant-along"],
+          "choices_per_question": { "age_1_3": 2, "age_4_5": 3 },
+          "distractor_pool": "colors",
+          "celebration_set": "pippa-cheer"
+        }
+      ]
+    }
+  ],
+  "words": {
+    "cat": { "text": "cat", "emoji": "🐱", "phrase": "I see a cat", "pool": "animals" },
+    "dog": { "text": "dog", "emoji": "🐶", "phrase": "I see a dog", "pool": "animals" },
+    "cow": { "text": "cow", "emoji": "🐮", "phrase": "I see a cow", "pool": "animals" },
+    "duck": { "text": "duck", "emoji": "🦆", "phrase": "I see a duck", "pool": "animals" },
+    "pig": { "text": "pig", "emoji": "🐷", "phrase": "I see a pig", "pool": "animals" },
+    "horse": { "text": "horse", "emoji": "🐴", "phrase": "I see a horse", "pool": "animals" },
+    "sheep": { "text": "sheep", "emoji": "🐑", "phrase": "I see a sheep", "pool": "animals" },
+    "chicken": { "text": "chicken", "emoji": "🐔", "phrase": "I see a chicken", "pool": "animals" },
+    "goat": { "text": "goat", "emoji": "🐐", "phrase": "I see a goat", "pool": "animals" },
+    "rabbit": { "text": "rabbit", "emoji": "🐰", "phrase": "I see a rabbit", "pool": "animals" },
+    "mouse": { "text": "mouse", "emoji": "🐭", "phrase": "I see a mouse", "pool": "animals" },
+    "bird": { "text": "bird", "emoji": "🐦", "phrase": "I see a bird", "pool": "animals" },
+    "frog": { "text": "frog", "emoji": "🐸", "phrase": "I see a frog", "pool": "animals" },
+    "fish": { "text": "fish", "emoji": "🐟", "phrase": "I see a fish", "pool": "animals" },
+    "bee": { "text": "bee", "emoji": "🐝", "phrase": "I see a bee", "pool": "animals" },
+    "butterfly": { "text": "butterfly", "emoji": "🦋", "phrase": "I see a butterfly", "pool": "animals" },
+    "turtle": { "text": "turtle", "emoji": "🐢", "phrase": "I see a turtle", "pool": "animals" },
+    "lion": { "text": "lion", "emoji": "🦁", "phrase": "I see a lion", "pool": "animals" },
+    "elephant": { "text": "elephant", "emoji": "🐘", "phrase": "I see an elephant", "pool": "animals" },
+    "monkey": { "text": "monkey", "emoji": "🐵", "phrase": "I see a monkey", "pool": "animals" },
+    "red": { "text": "red", "emoji": "🔴", "phrase": "I see red", "pool": "colors" },
+    "orange": { "text": "orange", "emoji": "🟠", "phrase": "I see orange", "pool": "colors" },
+    "yellow": { "text": "yellow", "emoji": "🟡", "phrase": "I see yellow", "pool": "colors" },
+    "green": { "text": "green", "emoji": "🟢", "phrase": "I see green", "pool": "colors" },
+    "blue": { "text": "blue", "emoji": "🔵", "phrase": "I see blue", "pool": "colors" },
+    "purple": { "text": "purple", "emoji": "🟣", "phrase": "I see purple", "pool": "colors" },
+    "pink": { "text": "pink", "emoji": "🩷", "phrase": "I see pink", "pool": "colors" },
+    "brown": { "text": "brown", "emoji": "🟤", "phrase": "I see brown", "pool": "colors" },
+    "black": { "text": "black", "emoji": "⚫", "phrase": "I see black", "pool": "colors" },
+    "white": { "text": "white", "emoji": "⚪", "phrase": "I see white", "pool": "colors" },
+    "gray": { "text": "gray", "emoji": "🩶", "phrase": "I see gray", "pool": "colors" },
+    "rainbow": { "text": "rainbow", "emoji": "🌈", "phrase": "I see a rainbow", "pool": "colors" }
+  },
+  "celebration_sets": {
+    "momo-cheer": {
+      "praise": ["Great job!", "Wonderful!", "You did it!", "Amazing!", "So smart!", "Yay!", "Perfect!", "Super star!"],
+      "retry": ["Try again!", "Almost! One more try!", "You can do it!"],
+      "celebration_line": "Yes! That's a {word}!",
+      "motivation": ["You are so smart!", "You are a super star!", "Wow! You learn so fast!"],
+      "chants": ["{letter}, {letter}, {word}! You did it!", "{word}! {word}! Hip hip hooray!"],
+      "song": { "title": "Momo Cheer Song", "beat_ms": 500, "lines": ["{letter}, {letter}, {word}!", "Clap your hands, sing with me!", "{word}! {word}! You did it!", "Momo is so proud of you!"] }
+    },
+    "pippa-cheer": {
+      "praise": ["Great job!", "Beautiful!", "You did it!", "Amazing!", "So clever!", "Yay!", "Perfect!", "Shining star!"],
+      "retry": ["Try again!", "Almost! One more try!", "You can do it!"],
+      "celebration_line": "Yes! That's {word}!",
+      "motivation": ["You are so clever!", "You shine like a rainbow!", "Wow! You know your colors!"],
+      "chants": ["{letter}, {letter}, {word}! You did it!", "{word}! {word}! Hip hip hooray!"],
+      "song": { "title": "Pippa Rainbow Song", "beat_ms": 500, "lines": ["{letter}, {letter}, {word}!", "Sing with Pippa, happy and free!", "{word}! {word}! You did it!", "Colors are fun for you and me!"] }
+    }
+  }
+}
