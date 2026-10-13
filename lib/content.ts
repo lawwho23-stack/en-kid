@@ -1,6 +1,7 @@
 import worldsJson from "@/content/worlds.json";
 
 export type AgeBand = "1-2" | "3-4" | "5";
+export type ActivityId = "tap-and-hear" | "listen-and-pick" | "chant-along";
 
 export type WordEntry = {
   text: string;
@@ -134,4 +135,44 @@ export function allTextIds(): string[] {
     set.motivation.forEach((_, i) => ids.add(`motivation:${setId}:${i}`));
   }
   return [...ids].sort();
+}
+
+/** The smallest complete voice set needed by one lesson activity. */
+export function audioIdsForActivity(
+  lesson: Lesson,
+  activity: ActivityId,
+): string[] {
+  if (activity === "tap-and-hear") {
+    return lesson.words.flatMap((word) => [`word:${word}`, `phrase:${word}`]);
+  }
+
+  const set = CELEBRATION_SETS[lesson.celebration_set];
+  if (activity === "chant-along") {
+    const wordId = lesson.words[0];
+    const word = WORDS[wordId].text;
+    return [
+      `chant:${wordId}`,
+      ...set.song.lines.map((line) => `line:${fillTemplate(line, word)}`),
+    ];
+  }
+
+  const ids = lesson.words.flatMap((wordId) => {
+    const word = WORDS[wordId].text;
+    return [
+      `prompt:${wordId}`,
+      `celebration:${wordId}`,
+      `chant:${wordId}`,
+      ...set.song.lines.map((line) => `line:${fillTemplate(line, word)}`),
+    ];
+  });
+  set.praise.forEach((_, index) =>
+    ids.push(`praise:${lesson.celebration_set}:${index}`),
+  );
+  set.retry.forEach((_, index) =>
+    ids.push(`retry:${lesson.celebration_set}:${index}`),
+  );
+  set.motivation.forEach((_, index) =>
+    ids.push(`motivation:${lesson.celebration_set}:${index}`),
+  );
+  return [...new Set(ids)];
 }

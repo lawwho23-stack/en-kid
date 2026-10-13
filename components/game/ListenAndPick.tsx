@@ -5,6 +5,7 @@ import { audio } from "@/lib/audio/engine";
 import {
   CELEBRATION_SETS,
   WORDS,
+  audioIdsForActivity,
   choicesForAge,
   fillTemplate,
   type AgeBand,
@@ -71,7 +72,19 @@ export function ListenAndPick({
   const [mood, setMood] = useState<Mood>("idle");
   const [tier, setTier] = useState<0 | 1 | 2 | 3>(0);
   const [praiseLine, setPraiseLine] = useState("");
+  const [ready, setReady] = useState(false);
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const askTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function clearPendingSpeech() {
+    if (idleTimer.current) clearTimeout(idleTimer.current);
+    if (askTimer.current) clearTimeout(askTimer.current);
+    if (retryTimer.current) clearTimeout(retryTimer.current);
+    idleTimer.current = null;
+    askTimer.current = null;
+    retryTimer.current = null;
+  }
 
   const speakWord = useCallback(
     (id: string) => {
@@ -84,22 +97,25 @@ export function ListenAndPick({
   // Entry: preload clips + speak the first word. Audio only, no setState.
   useEffect(() => {
     audio.unlock();
-    const ids = lesson.words.flatMap((w) => [
-      `word:${w}`,
-      `phrase:${w}`,
-      `prompt:${w}`,
-      `celebration:${w}`,
-      `chant:${w}`,
-    ]);
-    void audio.preload(ids);
-    const t = setTimeout(() => speakWord(round.word), 350);
-    return () => clearTimeout(t);
+    let active = true;
+    void audio
+      .preload(audioIdsForActivity(lesson, "listen-and-pick"))
+      .then(() => {
+        if (!active) return;
+        setReady(true);
+        audio.playPrompt(round.word);
+      });
+    return () => {
+      active = false;
+      clearPendingSpeech();
+      audio.stopAll();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Idle repeat every 5s while waiting for an answer. Timer only.
   useEffect(() => {
-    if (tier !== 0) return;
+    if (!ready || tier !== 0) return;
     if (idleTimer.current) clearTimeout(idleTimer.current);
     idleTimer.current = setTimeout(
       () => speakWord(round.word),
@@ -108,9 +124,12 @@ export function ListenAndPick({
     return () => {
       if (idleTimer.current) clearTimeout(idleTimer.current);
     };
-  }, [round.word, misses, tier, speakWord]);
+  }, [round.word, misses, ready, tier, speakWord]);
 
   function ask(word: string, m: Record<string, number>, slotHistory: number[]) {
+    // Stop the celebration chant before the next question speaks.
+    audio.stopAll();
+    clearPendingSpeech();
     const dealt = buildChoices(word, poolIds, count, slotHistory, m);
     setRound({
       word,
@@ -121,13 +140,12 @@ export function ListenAndPick({
     setTappedRight(false);
     setMood("idle");
     setTier(0);
-    if (idleTimer.current) clearTimeout(idleTimer.current);
-    setTimeout(() => speakWord(word), 350);
+    askTimer.current = setTimeout(() => speakWord(word), 350);
   }
 
   function handleTap(choice: Choice) {
     audio.unlock();
-    if (tier !== 0) return;
+    if (!ready || tier !== 0) return;
     if (idleTimer.current) clearTimeout(idleTimer.current);
     const word = round.word;
 
@@ -187,7 +205,8 @@ export function ListenAndPick({
       setTappedWrong(choice.wordId);
       setMood("encourage");
       audio.playRetry(lesson.celebration_set, m % set.retry.length);
-      setTimeout(() => {
+      if (retryTimer.current) clearTimeout(retryTimer.current);
+      retryTimer.current = setTimeout(() => {
         speakWord(word);
         setTappedWrong(null);
         setMood("idle");
@@ -196,6 +215,9 @@ export function ListenAndPick({
   }
 
   function next() {
+    // Tap-to-continue must silence the chant/song before moving on.
+    audio.stopAll();
+    clearPendingSpeech();
     if (doneWords.length >= lesson.words.length) {
       void flush();
       onDone();
@@ -226,8 +248,9 @@ export function ListenAndPick({
           <button
             type="button"
             onClick={() => speakWord(round.word)}
+            disabled={!ready}
             aria-label="Hear the word again"
-            className="flex h-24 w-24 items-center justify-center rounded-full bg-[#FFD84D] text-5xl shadow-xl"
+            className="flex h-24 w-24 items-center justify-center rounded-full bg-[#FFD84D] text-5xl shadow-xl disabled:opacity-50"
           >
             🔊
           </button>
@@ -238,7 +261,11 @@ export function ListenAndPick({
       </div>
 
       <p className="text-center text-2xl font-black text-white drop-shadow">
-        {tappedRight ? praiseLine : "Listen… then tap! 👂"}
+        {!ready
+          ? "Getting voices ready… 🎧"
+          : tappedRight
+            ? praiseLine
+            : "Listen… then tap! 👂"}
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-5">
@@ -249,7 +276,7 @@ export function ListenAndPick({
             label={WORDS[c.wordId].text}
             showLabel={showLabel}
             state={cardState(c)}
-            disabled={tier !== 0}
+            disabled={!ready || tier !== 0}
             onTap={() => handleTap(c)}
           />
         ))}

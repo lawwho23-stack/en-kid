@@ -4,10 +4,16 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { audio } from "@/lib/audio/engine";
-import { getWorld, type AgeBand } from "@/lib/content";
+import {
+  audioIdsForActivity,
+  getWorld,
+  type ActivityId,
+  type AgeBand,
+  type Lesson,
+} from "@/lib/content";
 import { useGame } from "@/lib/store";
 
-const ACTIVITIES = [
+const ACTIVITIES: Array<{ id: ActivityId; emoji: string; title: string }> = [
   { id: "tap-and-hear", emoji: "👆", title: "Tap & Hear" },
   { id: "listen-and-pick", emoji: "👂", title: "Listen & Pick" },
   { id: "chant-along", emoji: "🎵", title: "Chant Along" },
@@ -21,11 +27,16 @@ export default function WorldPage() {
   const flush = useGame((s) => s.flush);
   const [age, setAge] = useState<AgeBand>("3-4");
   const greeted = useRef(false);
+  const mounted = useRef(true);
 
   useEffect(() => {
+    mounted.current = true;
     if (world) beginSession(world.id);
     return () => {
+      mounted.current = false;
       void flush();
+      // Do not stopAll here: the greeting (if still loading) is guarded
+      // by `mounted`, and the next activity owns audio after navigation.
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world?.id]);
@@ -35,8 +46,16 @@ export default function WorldPage() {
     audio.unlock();
     if (!world || greeted.current) return;
     greeted.current = true;
-    void audio.preload([`greeting:${world.character.id}`]);
-    audio.playGreeting(world.character.id);
+    void audio
+      .preload([`greeting:${world.character.id}`])
+      .then(() => {
+        if (mounted.current) audio.playGreeting(world.character.id);
+      });
+  }
+
+  function preloadActivity(lesson: Lesson, activity: ActivityId) {
+    audio.unlock();
+    void audio.preload(audioIdsForActivity(lesson, activity));
   }
 
   if (!world) {
@@ -92,6 +111,7 @@ export default function WorldPage() {
                 <Link
                   key={a.id}
                   href={`/play/${a.id}?world=${world.id}&lesson=${lesson.id}&age=${age}`}
+                  onPointerDown={() => preloadActivity(lesson, a.id)}
                   className="btn-kid flex items-center justify-center gap-2 bg-[#7FE3B5] px-4 py-5 text-2xl text-[#3B3355]"
                 >
                   {a.emoji} {a.title}

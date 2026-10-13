@@ -26,6 +26,21 @@ def safe(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9_-]+", "-", name).strip("-")[:60]
 
 
+def local_clips(manifest: dict, clip_dir: str = CLIP_DIR):
+    """Yield manifest clip ids with their generated local MP3 paths."""
+    hashes: dict = manifest.get("hashes", {})
+    for clip_id in manifest.get("clips", {}):
+        content_hash = hashes.get(clip_id, "")
+        if not content_hash:
+            continue
+        local = os.path.join(
+            clip_dir,
+            f"{safe(clip_id)}-{content_hash}.mp3",
+        )
+        if os.path.exists(local):
+            yield clip_id, local
+
+
 def main() -> None:
     try:
         import psycopg
@@ -40,25 +55,14 @@ def main() -> None:
 
     with open(MANIFEST, encoding="utf-8") as f:
         manifest = json.load(f)
-    clips: dict = manifest.get("clips", {})
-    hashes: dict = manifest.get("hashes", {})
-
-    # Only DB-backed manifests (values starting with /api/audio/) are imported.
-    api_clips = {
-        cid: url for cid, url in clips.items() if url.startswith("/api/audio/")
-    }
-    if not api_clips:
-        print("Manifest has no /api/audio/ entries — nothing to import.")
+    clips = list(local_clips(manifest))
+    if not clips:
+        print("Manifest has no generated local clips — nothing to import.")
         return
 
     uploaded, skipped = 0, 0
     with psycopg.connect(dsn) as conn:
-        for clip_id, url in sorted(api_clips.items()):
-            h = hashes.get(clip_id, "")
-            local = os.path.join(CLIP_DIR, f"{safe(clip_id)}-{h}.mp3")
-            if not h or not os.path.exists(local):
-                print(f"  ! missing file for {clip_id} ({local})")
-                continue
+        for clip_id, local in sorted(clips):
             with open(local, "rb") as f:
                 data = f.read()
             digest = hashlib.sha256(data).hexdigest()
@@ -84,7 +88,7 @@ def main() -> None:
             uploaded += 1
         conn.commit()
     print(f"Done: {uploaded} uploaded, {skipped} skipped, "
-          f"{len(api_clips)} in manifest.")
+          f"{len(clips)} in manifest.")
 
 
 if __name__ == "__main__":

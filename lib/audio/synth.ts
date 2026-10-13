@@ -40,13 +40,28 @@ function tone(
   osc.connect(gain).connect(dest);
   osc.start(at);
   osc.stop(at + dur + 0.05);
+  return osc;
 }
 
 /** Play precomputed steps immediately (caller ensures <100ms tap response). */
-export function playSteps(ctx: BaseAudioContext, dest: AudioNode, steps: ToneStep[]) {
+export function playSteps(
+  ctx: BaseAudioContext,
+  dest: AudioNode,
+  steps: ToneStep[],
+  onSource?: (source: OscillatorNode) => void,
+) {
   const now = ctx.currentTime;
   for (const s of steps) {
-    tone(ctx, dest, s.freq, now + s.at, s.dur, s.type ?? "sine", s.gain ?? 0.25);
+    const source = tone(
+      ctx,
+      dest,
+      s.freq,
+      now + s.at,
+      s.dur,
+      s.type ?? "sine",
+      s.gain ?? 0.25,
+    );
+    onSource?.(source);
   }
   return steps.reduce((max, s) => Math.max(max, s.at + s.dur), 0);
 }
@@ -111,5 +126,32 @@ export function beatSteps(beats: number, beatSec: number): ToneStep[] {
       gain: 0.12,
     });
   }
+  return steps;
+}
+
+/** Original, royalty-free backing: soft percussion, bass, and a happy melody. */
+export function songSteps(beats: number, beatSec: number): ToneStep[] {
+  const melody = [261.63, 329.63, 392, 523.25, 392, 329.63, 293.66, 392];
+  const steps = beatSteps(beats, beatSec);
+
+  for (let i = 0; i < beats; i++) {
+    steps.push({
+      freq: melody[i % melody.length],
+      at: i * beatSec,
+      dur: Math.max(0.12, beatSec * 0.55),
+      type: "triangle",
+      gain: 0.045,
+    });
+    if (i % 2 === 0) {
+      steps.push({
+        freq: i % 8 < 4 ? 130.81 : 146.83,
+        at: i * beatSec,
+        dur: Math.max(0.18, beatSec * 0.85),
+        type: "sine",
+        gain: 0.05,
+      });
+    }
+  }
+
   return steps;
 }

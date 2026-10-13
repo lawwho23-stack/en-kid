@@ -1,22 +1,25 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { allTextIds, CELEBRATION_SETS, WORDS, WORLDS } from "@/lib/content";
 
 /** Every word in content must have a clip id in the manifest (doc section 19). */
 describe("audio manifest coverage", () => {
-  it("manifest exists and every text id resolves (synth fallback counts)", () => {
+  it("maps every required voice to an existing packaged MP3", () => {
     const manifest = JSON.parse(
       readFileSync("public/audio/audio-manifest.json", "utf8"),
     ) as { clips: Record<string, string> };
-    // Placeholder phase: empty clips map + synth fallback is valid.
-    // Once TTS files land, every id below must have a URL.
     const ids = allTextIds();
+
     expect(ids.length).toBeGreaterThan(100);
-    const missing = ids.filter((id) => !manifest.clips[id]);
-    if (Object.keys(manifest.clips).length > 0) {
-      expect(missing).toEqual([]);
-    } else {
-      expect(missing.length).toBe(ids.length); // all synth for now
+
+    for (const id of ids) {
+      const url = manifest.clips[id];
+      expect(url, `missing manifest URL for ${id}`).toMatch(
+        /^\/audio\/clips\/.+-[a-f0-9]{12}\.mp3$/,
+      );
+      expect(existsSync(`public${url}`), `missing packaged file for ${id}`).toBe(
+        true,
+      );
     }
   });
 });
